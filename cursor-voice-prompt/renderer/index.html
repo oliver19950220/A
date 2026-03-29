@@ -32,6 +32,23 @@
         <div class="panel-title">本会话已识别（只读）</div>
         <pre id="preview" class="preview"></pre>
       </section>
+      <section class="panel manual">
+        <div class="panel-title">手动输入（语音不可用 / 网络异常时使用）</div>
+        <p class="manual-hint">
+          在下方输入或粘贴整段 Prompt，先让 <strong>Cursor 输入框</strong> 获得焦点，再点「注入到焦点」。
+        </p>
+        <textarea
+          id="manualText"
+          class="manual-text"
+          rows="5"
+          placeholder="在此输入要写入 Cursor 的文字…"
+          spellcheck="false"
+        ></textarea>
+        <div class="manual-actions">
+          <button type="button" id="btnInjectManual" class="btn primary">注入到焦点</button>
+          <button type="button" id="btnTestPaste" class="btn ghost">测试粘贴</button>
+        </div>
+      </section>
       <p class="shortcuts">
         全局快捷键：<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> 显示/隐藏窗口；
         <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd> 切换聆听

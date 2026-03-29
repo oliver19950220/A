@@ -166,10 +166,51 @@ function clearBuffer() {
   setStatus('已清空会话缓冲区（下一句不再自动加前置换行）');
 }
 
+/**
+ * 将手动输入的整段文字注入前台焦点（不依赖 Web Speech）
+ */
+async function injectManualText() {
+  const raw = $('manualText').value || '';
+  const text = raw.replace(/\r\n/g, '\n').trimEnd();
+  if (!text.trim()) {
+    setStatus('请先在下框中输入或粘贴要注入的文字。');
+    return;
+  }
+
+  const leadingNewline = hasInjectedInSession;
+  try {
+    setStatus('正在注入手动内容到前台焦点…');
+    await window.voiceApp.injectSnippet(text, leadingNewline);
+    if (!hasInjectedInSession) {
+      hasInjectedInSession = true;
+    }
+    fullBuffer += (leadingNewline ? '\n' : '') + text;
+    renderPreview();
+    setStatus('已粘贴手动内容。若 Cursor 里没有出现，请确认输入框仍为前台焦点。');
+  } catch (e) {
+    setStatus(`手动注入失败：${e && e.message ? e.message : String(e)}`);
+  }
+}
+
+/**
+ * 验证剪贴板 + 模拟 Ctrl+V 是否正常（与语音识别无关）
+ */
+async function testPasteToFocus() {
+  try {
+    setStatus('正在发送测试片段到前台焦点…');
+    await window.voiceApp.injectSnippet('【粘贴测试】', false);
+    setStatus('若 Cursor 输入框出现「【粘贴测试】」，说明注入链路正常，问题在语音识别网络。');
+  } catch (e) {
+    setStatus(`测试失败：${e && e.message ? e.message : String(e)}`);
+  }
+}
+
 function wireUi() {
   $('btnStart').addEventListener('click', () => startListening());
   $('btnStop').addEventListener('click', () => stopListening());
   $('btnClear').addEventListener('click', () => clearBuffer());
+  $('btnInjectManual').addEventListener('click', () => injectManualText());
+  $('btnTestPaste').addEventListener('click', () => testPasteToFocus());
 
   window.voiceApp.onToggleListening(() => {
     if (isListening) {
