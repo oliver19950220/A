@@ -30,6 +30,14 @@ body {
   font-size: 13px;
 }
 
+.hint code {
+  font-size: 12px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: #2d2f34;
+  color: #bdc1c6;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

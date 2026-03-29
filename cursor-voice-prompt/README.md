@@ -60,6 +60,17 @@ $env:ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
 npm install
 ```
 
+### 开始聆听后终端出现 `chunked_data_pipe_upload_data_stream` / `OnSizeReceived failed … Error: -2`
+
+这与 **Web Speech API 向云端上传音频流** 有关，常见于 **VPN、系统代理、防火墙或运营商路径** 导致上传中断；不一定是你业务代码写错。
+
+建议：
+
+1. **暂时关闭 VPN** 或改为 **分流**（让 Electron/本机直连可走通识别服务的线路），再试「开始聆听」。  
+2. 在 **可正常打开 Google 相关服务** 的网络环境下试（与 Chrome 网页语音输入所需网络类似）。  
+3. 若界面状态栏出现 **「网络异常」** 等提示，说明 `recognition` 已回报 `network` / `aborted` 等，与上述终端日志往往同源。  
+4. 纯离线或无法访问识别服务时，可改用系统 **Win + H** 听写（见 PRD 3.1）。
+
 ## 技术栈
 
 - Electron 33 + 预加载脚本（`contextIsolation`）

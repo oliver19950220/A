@@ -24,6 +24,42 @@ function renderPreview() {
 }
 
 /**
+ * 将 SpeechRecognition 错误码转为用户可读说明（含 H1：网络/VPN/代理）
+ * @param {SpeechRecognitionErrorEvent} e
+ * @returns {{ message: string, shouldStop: boolean }}
+ */
+function describeSpeechError(e) {
+  const code = e.error;
+  /** 应停止聆听、避免 onend 自动重启刷错 */
+  const fatalNetwork = code === 'network' || code === 'aborted' || code === 'service-not-allowed';
+
+  const table = {
+    network:
+      '网络异常：Web Speech 需要向云端上传音频。请尝试关闭或调整 VPN/代理、换网络，或让 Electron 走可访问识别服务的线路。终端里 chunked_data_pipe…Error:-2 多与上传被中断有关。',
+    aborted:
+      '识别会话被中断。若频繁出现，多为网络或代理不稳定，可按「网络异常」同样排查。',
+    'service-not-allowed': '当前环境不允许使用语音识别服务（策略或网络限制）。',
+    'not-allowed': '麦克风权限被拒绝。请在系统设置中允许本应用使用麦克风。',
+    'audio-capture': '无法访问麦克风。请检查设备连接与其它应用是否占用麦克风。',
+    'no-speech': '未检测到语音（可忽略，继续说话即可）。',
+    'language-not-supported': '不支持当前语言，请检查 zh-CN 或系统语言设置。',
+  };
+
+  if (code === 'no-speech') {
+    return { message: table['no-speech'], shouldStop: false };
+  }
+
+  if (table[code]) {
+    return { message: table[code], shouldStop: fatalNetwork || code === 'not-allowed' || code === 'audio-capture' };
+  }
+
+  return {
+    message: `识别错误：${code}`,
+    shouldStop: fatalNetwork,
+  };
+}
+
+/**
  * @param {string} transcript
  */
 async function onFinalSegment(transcript) {
@@ -58,6 +94,10 @@ function startListening() {
   recognition.continuous = true;
   recognition.interimResults = true;
 
+  recognition.onstart = () => {
+    setStatus('正在聆听…（请先确保 Cursor 输入框已聚焦）');
+  };
+
   recognition.onresult = (event) => {
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const result = event.results[i];
@@ -71,7 +111,11 @@ function startListening() {
   };
 
   recognition.onerror = (e) => {
-    setStatus(`识别错误：${e.error}`);
+    const { message, shouldStop } = describeSpeechError(e);
+    setStatus(message);
+    if (shouldStop) {
+      stopListening();
+    }
   };
 
   recognition.onend = () => {
@@ -79,7 +123,7 @@ function startListening() {
       try {
         recognition.start();
       } catch (_) {
-        /* 忽略连续 start 抛错 */
+        /* 连续 start 抛错时忽略 */
       }
     }
   };
@@ -95,7 +139,7 @@ function startListening() {
   isListening = true;
   $('btnStart').disabled = true;
   $('btnStop').disabled = false;
-  setStatus('正在聆听…（请先确保 Cursor 输入框已聚焦）');
+  setStatus('正在启动麦克风与识别…');
 }
 
 function stopListening() {

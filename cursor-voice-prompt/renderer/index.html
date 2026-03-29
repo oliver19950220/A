@@ -15,6 +15,8 @@
       <h1 class="title">语音 → Cursor</h1>
       <p class="hint">
         使用前请先点击 <strong>Cursor</strong> 的聊天/Composer 输入框，使光标在末尾；再在此点击「开始聆听」。
+        Web Speech 会向云端上传音频：若使用 VPN/代理，请确保本应用所在网络可稳定访问识别服务，否则终端可能出现
+        <code>chunked_data_pipe</code> 类报错且识别失败。
       </p>
       <div class="actions">
         <button type="button" id="btnStart" class="btn primary">开始聆听</button>
