@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cursor 语音 Prompt</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1 class="title">语音 → Cursor</h1>
+      <p class="hint">
+        使用前请先点击 <strong>Cursor</strong> 的聊天/Composer 输入框，使光标在末尾；再在此点击「开始聆听」。
+      </p>
+      <div class="actions">
+        <button type="button" id="btnStart" class="btn primary">开始聆听</button>
+        <button type="button" id="btnStop" class="btn" disabled>停止</button>
+        <button type="button" id="btnClear" class="btn ghost">清空缓冲</button>
+      </div>
+      <p id="status" class="status">就绪</p>
+      <section class="panel">
+        <div class="panel-title">当前句（临时）</div>
+        <div id="interim" class="interim"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-title">本会话已识别（只读）</div>
+        <pre id="preview" class="preview"></pre>
+      </section>
+      <p class="shortcuts">
+        全局快捷键：<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> 显示/隐藏窗口；
+        <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd> 切换聆听
+      </p>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
